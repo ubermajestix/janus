@@ -7,6 +7,91 @@ if janus#is_plugin_enabled('ctrlp') && has("gui_macvim")
   macmenu &File.New\ Tab key=<D-S-t>
 endif
 
+colorscheme molokai
+
+if has("gui_running")
+  set guioptions=egmrt
+endif
+
+let g:NERDTreeWinPos = "right"
+
+
+"From http://stevelosh.com/blog/2010/09/coming-home-to-vim/#using-the-leader
+let mapleader = ","
+
+nnoremap / /\v
+vnoremap / /\v
+set ignorecase
+set smartcase
+set gdefault
+set incsearch
+set showmatch
+set hlsearch
+nnoremap <leader><space> :noh<cr>
+nnoremap <tab> %
+vnoremap <tab> %
+
+" fold tag function: for html
+nnoremap <leader>ft Vatzf
+
+" for speed
+nnoremap ; :
+inoremap jj <ESC>
+
+
+" Switch to vertical split
+nnoremap <leader>w <C-w>v<C-w>l
+
+"Training wheels
+nnoremap j gj
+nnoremap k gk
+
+" Map alternate in vertical split to ,a
+nnoremap <leader>a :AV<cr>
+
+" Open gitx
+nnoremap <leader>gx :!gitx<cr>
+
+" Tabularize
+nnoremap <leader><tab> :Tabularize /
+
+" Open ColorSelector
+nnoremap <D-C> :ColorHEX<cr>
+
+" Close quickfix window
+nnoremap <leader>q :ccl<cr>
+
+" Exit insert mode when buffer is written
+au BufWrite * stopinsert
+
+" Write all changed buffers
+nnoremap <leader>s :wa
+
+
+" ctags, ctrlp, NERDTree refresh
+
+function Refresh()
+  echo "refreshing tags and files..."
+
+  silent !if [ -d .git ]; then git ls-files -c -o --exclude-standard | ctags -L -; else ctags -R; fi
+
+  if exists(":CtrlPClearAllCaches") == 2
+    CtrlPClearAllCaches
+  endif
+
+  if exists("t:NERDTreeBufName")
+    let nr = bufwinnr(t:NERDTreeBufName)
+    if nr != -1
+      exe nr . "wincmd w"
+      exe substitute(mapcheck("R"), "<CR>", "", "")
+      wincmd p
+    endif
+  endif
+endfunction
+
+map <silent> <Leader>r :call Refresh()<CR>
+
+" Read after config
 if filereadable(expand("~/.gvimrc.after"))
   source ~/.gvimrc.after
 endif
